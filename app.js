@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const User = require('./models/userModel');
 const indexRouter = require('./routes/indexRouter');
 const signUpRouter = require('./routes/signUpRouter');
+const messageRouter = require('./routes/messageRouter');
 const bcrypt = require('bcryptjs');
 
 const mongoDb = "mongodb+srv://quysonnguyen:prshinkenger3529@cluster0.ooejzu9.mongodb.net/MemberBoard?retryWrites=true&w=majority";
@@ -52,6 +53,11 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
     done(null, user);
 });
+
+app.use(function(req, res, next) {
+    res.locals.currentUser = req.user;
+    next();
+});
    
 app.use(passport.initialize());
 app.use(passport.session());
@@ -60,6 +66,7 @@ app.use(express.json());
 
 app.use(signUpRouter);
 app.use(indexRouter);
+app.use(messageRouter);
 
 app.post(
     "/log-in",
