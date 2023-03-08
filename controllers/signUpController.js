@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const bcrypt = require('bcryptjs');
 
 const getSignUp = (req, res) => {
     res.render('sign-up');
@@ -13,9 +14,15 @@ const postSignUp = (req, res) => {
     } else {
         newUser.membership = "False"
     };
-    newUser.save()
-        .then((result) => res.redirect('/'))
-        .catch((error) => console.log(error));
+    bcrypt.hash(newUser.password, 10, (err, hashedPassword) => {
+        if(err) return next(err);
+        console.log(newUser.password);
+        newUser.password = hashedPassword;
+        console.log(newUser.password);
+        newUser.save()
+            .then((result) => res.redirect('/'))
+            .catch((error) => console.log(error));
+    }); 
 };
 
 module.exports = {getSignUp, postSignUp};

@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const User = require('./models/userModel');
 const indexRouter = require('./routes/indexRouter');
 const signUpRouter = require('./routes/signUpRouter');
+const bcrypt = require('bcryptjs');
 
 const mongoDb = "mongodb+srv://quysonnguyen:prshinkenger3529@cluster0.ooejzu9.mongodb.net/MemberBoard?retryWrites=true&w=majority";
 mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
@@ -28,13 +29,16 @@ const strategy = new LocalStrategy(
             message: 'User not found'
           })
         };
-        if (user.password !== password) {
-          return done(null, false, { message: "Incorrect password" });
-        };
-        done(null, user);
-      } catch (error) {
+        bcrypt.compare(password, user.password, (err, res) => {
+            if (res) {
+              return done(null, user)
+            } else {
+              return done(null, false, { message: "Incorrect password" })
+            }
+        });
+    } catch (error) {
         done(error, false);
-      }
+    }
     }
 );
 
